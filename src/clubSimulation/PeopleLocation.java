@@ -22,34 +22,34 @@ public class PeopleLocation  { // this is a separate class so don't have to acce
 	}
 	
 	//setter
-	public  void setInRoom(boolean in) {
+	synchronized public  void setInRoom(boolean in) {
 		this.inRoom.set(in);
 	}
 	
 	//getter and setter
-	public boolean getArrived() {
+	synchronized public boolean getArrived() {
 		return arrived.get();
 	}
-	public void setArrived() {
+	synchronized public void setArrived() {
 		this.arrived.set(true);;
 	}
 
 //getter and setter
-	public GridBlock getLocation() {
+	synchronized public GridBlock getLocation() {
 		return location;
 	}
-	public  void setLocation(GridBlock location) {
+	synchronized public  void setLocation(GridBlock location) {
 		this.location = location;
 	}
 
 	//getter
-	public  int getX() { return location.getX();}	
+	synchronized public  int getX() { return location.getX();}	
 	
 	//getter
-	public  int getY() {	return location.getY();	}
+	synchronized public  int getY() {	return location.getY();	}
 	
 	//getter
-	public  int getID() {	return ID;	}
+	synchronized public  int getID() {	return ID;	}
 
 	//getter
 	public  synchronized boolean inRoom() {

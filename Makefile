@@ -1,22 +1,34 @@
 JAVAC=/usr/bin/javac
-
+JAVA=/usr/bin/java
 .SUFFIXES: .java .class
 
-SRCDIR=src
+SRCDIR=src/ClubSimulation
 BINDIR=bin
 
-$(BINDIR)/%.class:$(SRCDIR)/%.java
-	javac -d $(BINDIR)/ -cp $(BINDIR) $<
-	
-CLASSES=
-		
-		
-CLASS_FILES=$(CLASSES:%.class=$(BINDIR)/%.class)
+# Compile .java files into .class files in the specified directory
+$(BINDIR)/%.class: $(SRCDIR)/%.java
+	$(JAVAC) -d $(BINDIR) -cp $(BINDIR) -sourcepath $(SRCDIR) $<
 
+# List of classes to compile
+CLASSES=GridBlock \
+	PeopleCounter \
+	PeopleLocation \
+	CounterDisplay \
+	ClubView \
+	ClubGrid \
+	Clubgoer \
+	ClubSimulation
+
+# Transform class names into corresponding .class filenames
+CLASS_FILES=$(CLASSES:%=$(BINDIR)/%.class)
+
+# Default target to build all class files
 default: $(CLASS_FILES)
 
+# Clean up generated .class files
 clean:
-	rm bin/*
+	rm -f $(BINDIR)/*.class
 
+# Run the simulation
 run: $(CLASS_FILES)
-	java -cp $(BINDIR) run $(totalPeople) $(gridX) $(gridY) $(capacity)
+	$(JAVA) -cp $(BINDIR) clubSimulation.ClubSimulation $(totalPeople) $(gridX) $(gridY) $(capacity)

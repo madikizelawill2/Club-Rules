@@ -19,8 +19,8 @@ public class Clubgoer extends Thread {
 	private boolean inRoom;
 	private boolean thirsty;
 	private boolean wantToLeave;
-	private static AtomicBoolean paused; //atomic boolean for pausing
-	private static CountDownLatch startSignal; //countdown latch for starting
+	static AtomicBoolean paused; //atomic boolean for pausing
+	static CountDownLatch startSignal; //countdown latch for starting
 	private int ID; //thread ID 
 
 
@@ -87,6 +87,10 @@ public class Clubgoer extends Thread {
 	//get drink at bar
 		private synchronized void getDrink() throws InterruptedException {
 			//FIX SO BARMAN GIVES THE DRINK AND IT IS NOT AUTOMATIC
+			while (!BarmanPos()) {
+				wait(1000);
+			}
+			wait(1000);
 			thirsty=false;
 			System.out.println("Thread "+this.ID + " got drink at bar position: " + currentBlock.getX()  + " " +currentBlock.getY() );
 			sleep(movingSpeed*5);  //wait a bit

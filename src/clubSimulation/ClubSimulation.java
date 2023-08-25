@@ -69,16 +69,28 @@ public class ClubSimulation {
 		startB.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e)  {
 
+				Clubgoer.startSignal.countDown(); //start all threads
+				startB.setEnabled(false);
 			    	  	// THIS DOES NOTHING - MUST BE FIXED  	  
 		    }
-		   });
+		});
 			
 		final JButton pauseB = new JButton("Pause ");;
 			
 			// add the listener to the jbutton to handle the "pressed" event
 			pauseB.addActionListener(new ActionListener() {
 		      public void actionPerformed(ActionEvent e) {
-		    		// THIS DOES NOTHING - MUST BE FIXED  	
+		    		// THIS DOES NOTHING - MUST BE FIXED 
+					synchronized (Clubgoer.paused) {
+						if (Clubgoer.paused.get()) {
+							Clubgoer.paused.set(false);
+							pauseB.setText("Pause");
+							Clubgoer.paused.notifyAll();
+						} else {
+							Clubgoer.paused.set(true);
+							pauseB.setText("Resume");
+						}
+					} 	
 		      }
 		    });
 			

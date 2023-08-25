@@ -68,11 +68,12 @@ public class ClubSimulation {
 		// add the listener to the jbutton to handle the "pressed" event
 		startB.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e)  {
+
 			    	  	// THIS DOES NOTHING - MUST BE FIXED  	  
 		    }
 		   });
 			
-			final JButton pauseB = new JButton("Pause ");;
+		final JButton pauseB = new JButton("Pause ");;
 			
 			// add the listener to the jbutton to handle the "pressed" event
 			pauseB.addActionListener(new ActionListener() {

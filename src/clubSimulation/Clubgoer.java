@@ -12,17 +12,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Clubgoer extends Thread {
 	
 	public static ClubGrid club; //shared club
-
 	GridBlock currentBlock;
 	private Random rand;
 	private int movingSpeed;
-	
 	private PeopleLocation myLocation;
 	private boolean inRoom;
 	private boolean thirsty;
 	private boolean wantToLeave;
-	
+	private static AtomicBoolean paused; //atomic boolean for pausing
+	private static CountDownLatch startSignal; //countdown latch for starting
 	private int ID; //thread ID 
+
 
 	
 	Clubgoer( int ID,  PeopleLocation loc,  int speed) {
@@ -52,17 +52,33 @@ public class Clubgoer extends Thread {
 	//setter
 
 	//check to see if user pressed pause button
-	private void checkPause() {
-		// THIS DOES NOTHING - MUST BE FIXED  	
+	private synchronized void checkPause() {
+		// THIS DOES NOTHING - MUST BE FIXED
+		synchronized (paused) {
+			while (paused.get()) {
+				try {
+					paused.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}  	
         
     }
-	private void startSim() {
-		// THIS DOES NOTHING - MUST BE FIXED  	
+	private synchronized void startSim() {
+		// THIS DOES NOTHING - MUST BE FIXED 
+		synchronized (startSignal) {
+			try {
+				startSignal.await();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
         
     }
 	
 	//get drink at bar
-		private void getDrink() throws InterruptedException {
+		private synchronized void getDrink() throws InterruptedException {
 			//FIX SO BARMAN GIVES THE DRINK AND IT IS NOT AUTOMATIC
 			thirsty=false;
 			System.out.println("Thread "+this.ID + " got drink at bar position: " + currentBlock.getX()  + " " +currentBlock.getY() );

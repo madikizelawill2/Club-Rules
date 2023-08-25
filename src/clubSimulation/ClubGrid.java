@@ -16,6 +16,8 @@ public class ClubGrid {
 	private final static int minY =5;//minimum y dimension
 	
 	private PeopleCounter counter;
+
+
 	
 	ClubGrid(int x, int y, int [] exitBlocks,PeopleCounter c) throws InterruptedException {
 		if (x<minX) x=minX; //minimum x
@@ -46,11 +48,11 @@ public class ClubGrid {
 		}
 	}
 	
-		public  int getMaxX() {
+	public synchronized int getMaxX() {
 		return x;
 	}
 	
-		public int getMaxY() {
+	public synchronized int getMaxY() {
 		return y;
 	}
 
@@ -58,7 +60,7 @@ public class ClubGrid {
 		return entrance;
 	}
 
-	public  boolean inGrid(int i, int j) {
+	public synchronized boolean inGrid(int i, int j) {
 		if ((i>=x) || (j>=y) ||(i<0) || (j<0)) 
 			return false;
 		return true;
@@ -71,12 +73,18 @@ public class ClubGrid {
 	}
 	
 	public synchronized GridBlock enterClub(PeopleLocation myLocation) throws InterruptedException  {
-		counter.personArrived(); //add to counter of people waiting 
-		entrance.get(myLocation.getID());
-		counter.personEntered(); //add to counter
-		myLocation.setLocation(entrance);
-		myLocation.setInRoom(true);
-		return entrance;
+
+		synchronized (entrance) {
+			while(counter.overCapacity() || entrance.occupied()){
+				entrance.wait();
+			}
+			counter.personArrived(); //add to counter of people waiting 
+			entrance.get(myLocation.getID());
+			counter.personEntered(); //add to counter
+			myLocation.setLocation(entrance);
+			myLocation.setInRoom(true);
+			return entrance;
+			}
 	}
 	
 	
@@ -108,11 +116,14 @@ public class ClubGrid {
 	
 
 	public  synchronized void leaveClub(GridBlock currentBlock,PeopleLocation myLocation)   {
+		synchronized (counter){
 			currentBlock.release();
 			counter.personLeft(); //add to counter
 			myLocation.setInRoom(false);
 			entrance.notifyAll();
+		}
 	}
+			
 
 	public GridBlock getExit() {
 		return exit;

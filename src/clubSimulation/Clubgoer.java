@@ -19,8 +19,8 @@ public class Clubgoer extends Thread {
 	private boolean inRoom;
 	private boolean thirsty;
 	private boolean wantToLeave;
-	static AtomicBoolean paused; //atomic boolean for pausing
-	static CountDownLatch startSignal; //countdown latch for starting
+	static AtomicBoolean paused = new AtomicBoolean(false); //atomic boolean for pausing
+	static CountDownLatch startSignal = new CountDownLatch(1); //countdown latch for starting
 	private int ID; //thread ID 
 
 
@@ -36,23 +36,23 @@ public class Clubgoer extends Thread {
 	}
 	
 	//getter
-	public  boolean inRoom() {
+	public synchronized boolean inRoom() {
 		return inRoom;
 	}
 	
 	//getter
-	public   int getX() { return currentBlock.getX();}	
+	public synchronized int getX() { return currentBlock.getX();}	
 	
 	//getter
-	public   int getY() {	return currentBlock.getY();	}
+	public  synchronized int getY() {	return currentBlock.getY();	}
 	
 	//getter
-	public   int getSpeed() { return movingSpeed; }
+	public  synchronized int getSpeed() { return movingSpeed; }
 
 	//setter
 
 	//check to see if user pressed pause button
-	private synchronized void checkPause() {
+	private void checkPause() {
 		// THIS DOES NOTHING - MUST BE FIXED
 		synchronized (paused) {
 			while (paused.get()) {
@@ -65,9 +65,9 @@ public class Clubgoer extends Thread {
 		}  	
         
     }
-	private synchronized void startSim() {
+	private void startSim() {
 		// THIS DOES NOTHING - MUST BE FIXED 
-		synchronized (startSignal) {
+		synchronized (this) {
 			try {
 				startSignal.await();
 			} catch (InterruptedException e) {

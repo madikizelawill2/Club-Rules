@@ -76,6 +76,13 @@ public class Clubgoer extends Thread {
 		}
         
     }
+
+	public synchronized boolean BarmanPos() throws InterruptedException{
+		if (club.whichBlock(currentBlock.getX(), club.getBar_y() + 1).occupied()) {
+			return true;
+		}
+		return false;
+	}
 	
 	//get drink at bar
 		private synchronized void getDrink() throws InterruptedException {

@@ -54,7 +54,7 @@ public class ClubGrid {
 		return y;
 	}
 
-	public GridBlock whereEntrance() { 
+	public synchronized GridBlock whereEntrance() { 
 		return entrance;
 	}
 
@@ -64,13 +64,13 @@ public class ClubGrid {
 		return true;
 	}
 	
-	public  boolean inPatronArea(int i, int j) {
+	public  synchronized boolean inPatronArea(int i, int j) {
 		if ((i>=x) || (j>bar_y) ||(i<0) || (j<0)) 
 			return false;
 		return true;
 	}
 	
-	public GridBlock enterClub(PeopleLocation myLocation) throws InterruptedException  {
+	public synchronized GridBlock enterClub(PeopleLocation myLocation) throws InterruptedException  {
 		counter.personArrived(); //add to counter of people waiting 
 		entrance.get(myLocation.getID());
 		counter.personEntered(); //add to counter
@@ -107,7 +107,7 @@ public class ClubGrid {
 	} 
 	
 
-	public  void leaveClub(GridBlock currentBlock,PeopleLocation myLocation)   {
+	public  synchronized void leaveClub(GridBlock currentBlock,PeopleLocation myLocation)   {
 			currentBlock.release();
 			counter.personLeft(); //add to counter
 			myLocation.setInRoom(false);

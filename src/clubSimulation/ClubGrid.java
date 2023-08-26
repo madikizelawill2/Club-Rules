@@ -11,6 +11,7 @@ public class ClubGrid {
 	public  final int bar_y;
 	
 	private GridBlock exit;
+	private GridBlock barmanCounter;
 	private GridBlock entrance; //hard coded entrance
 	private final static int minX =5;//minimum x dimension
 	private final static int minY =5;//minimum y dimension
@@ -26,6 +27,7 @@ public class ClubGrid {
 		this.y=y;
 		this.bar_y=y-3;
 		Blocks = new GridBlock[x][y];
+		barmanCounter = Blocks[getMaxX() - 1][getBar_y() + 1];
 		this.initGrid(exitBlocks);
 		entrance=Blocks[getMaxX()/2][0];
 		counter=c;
@@ -123,7 +125,49 @@ public class ClubGrid {
 			entrance.notifyAll();
 		}
 	}
-			
+
+	public synchronized GridBlock getBarmanCounter(PeopleLocation myLocation) throws InterruptedException {
+
+		synchronized (barmanCounter) {
+			while(barmanCounter.occupied()){
+				barmanCounter.wait();
+			}
+			barmanCounter.get(myLocation.getID());
+			myLocation.setLocation(barmanCounter);
+			myLocation.setInRoom(true);
+			return barmanCounter;
+		}
+	}
+
+	public GridBlock servingDrinks(GridBlock currentBlock,int step_x, int step_y,PeopleLocation myLocation) throws InterruptedException {
+
+		int c_x = currentBlock.getX();
+		int c_y = currentBlock.getY();
+
+		int new_x = c_x + step_x; //new block x coordinates
+		int new_y = c_y + step_y; // new block y  coordinates
+
+		//restrict i an j to grid
+		if (!inPatronArea(new_x,new_y)) {
+			//Invalid move to outside  - ignore
+			return currentBlock;
+		}
+
+		if (new_x <= -1 || new_x >= getMaxX()) {
+			return currentBlock;
+		}
+
+		if ((new_x==currentBlock.getX())&&(new_y==currentBlock.getY())) //not actually moving
+			return currentBlock;
+
+		GridBlock newBlock = Blocks[new_x][new_y];
+
+		if (!newBlock.get(myLocation.getID())) return currentBlock; //stay where you are
+
+		currentBlock.release(); //must release current block
+		myLocation.setLocation(newBlock);
+		return newBlock;
+	}
 
 	public GridBlock getExit() {
 		return exit;

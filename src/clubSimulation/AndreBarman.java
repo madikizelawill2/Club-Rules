@@ -8,10 +8,11 @@ public class AndreBarman extends Thread{
     
     private boolean isBarmanMoving = false;
     private GridBlock currentBlock;
-    private GridBlock workingSpace;
+    private ClubGrid workingSpace;
     private int movingSpeed;
     private PeopleLocation myLocation;
     public int stepsTaken = 0;
+    private int stepsTakenByBarman = -1;
     public static ClubGrid club;
     public static AtomicBoolean paused = new AtomicBoolean(false);
     public static CountDownLatch startSignal = new CountDownLatch(1);
@@ -67,32 +68,33 @@ public class AndreBarman extends Thread{
 
     private void moveBarmanAcross() throws InterruptedException{
         
+        synchronized ((currentBlock)){
+            if (currentBlock.getX() + 1 >= club.getMaxX()){
+                stepsTakenByBarman = -1;
+            }
+            else if (currentBlock.getX() - 1 <= -1){
+                stepsTakenByBarman = 1;
+            }
+
+            if (patronInCounter()){
+                Thread.sleep(1000);
+            }
+            currentBlock = club.servingDrinks(currentBlock, stepsTakenByBarman, 0, myLocation);
+        }
     }
-
-
-
-    // public void move() throws InterruptedException{
-    //     if (isBarmanMoving){
-    //         if (currentBlock.getX() == workingSpace.getX() && currentBlock.getY() == workingSpace.getY()){
-    //             isBarmanMoving = false;
-    //             serve();
-    //         }
-    //         else{
-    //             if (currentBlock.getX() < workingSpace.getX()){
-    //                 currentBlock = club.whichBlock(currentBlock.getX() + 1, currentBlock.getY());
-    //             }
-    //             else if (currentBlock.getX() > workingSpace.getX()){
-    //                 currentBlock = club.whichBlock(currentBlock.getX() - 1, currentBlock.getY());
-    //             }
-    //             else if (currentBlock.getY() < workingSpace.getY()){
-    //                 currentBlock = club.whichBlock(currentBlock.getX(), currentBlock.getY() + 1);
-    //             }
-    //             else if (currentBlock.getY() > workingSpace.getY()){
-    //                 currentBlock = club.whichBlock(currentBlock.getX(), currentBlock.getY() - 1);
-    //             }
-    //             stepsTaken++;
-    //         }
-    //     }
-    // }   
-
+    
+    public void run(){
+        try{
+            startSimulation();
+            while (isBarmanMoving){
+                checkPause();
+                serve();
+                moveBarmanAcross();
+                Thread.sleep(movingSpeed);
+            }
+        }
+        catch (InterruptedException e){
+            e.printStackTrace();
+        }
+    }
 }

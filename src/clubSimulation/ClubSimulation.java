@@ -22,6 +22,9 @@ public class ClubSimulation {
 	
 	static Clubgoer[] patrons; // array for customer threads
 	static PeopleLocation [] peopleLocations;  //array to keep track of where customers are
+	static AndreBarman barman; //thread for barman
+	static PeopleLocation barmanLocation; //location of barman
+	static int barmanSpeed; //speed of barman
 	
 	static PeopleCounter tallys; //counters for number of people inside and outside club
 
@@ -138,6 +141,10 @@ public class ClubSimulation {
 		
 		Random rand = new Random();
 
+		barmanSpeed = (int)(Math.random() * (maxWait-minWait)+minWait); //range of speeds for customers
+		barmanLocation = new PeopleLocation(noClubgoers); //!check this or change it to -1
+		barman = new AndreBarman(barmanLocation, barmanSpeed, clubGrid, Clubgoer.paused, Clubgoer.startSignal);
+
         for (int i=0;i<noClubgoers;i++) {
         		peopleLocations[i]=new PeopleLocation(i);
         		int movingSpeed=(int)(Math.random() * (maxWait-minWait)+minWait); //range of speeds for customers
@@ -151,6 +158,8 @@ public class ClubSimulation {
       	//Start counter thread - for updating counters
       	Thread s = new Thread(counterDisplay);  
       	s.start();
+		//start barman thread
+		barman.start();
       	
       	for (int i=0;i<noClubgoers;i++) {
 			patrons[i].start();

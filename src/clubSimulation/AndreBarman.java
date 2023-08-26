@@ -17,11 +17,12 @@ public class AndreBarman extends Thread{
     public static AtomicBoolean paused = new AtomicBoolean(false);
     public static CountDownLatch startSignal = new CountDownLatch(1);
 
-    AndreBarman(PeopleLocation loc, int speed, ClubGrid club, AtomicBoolean paused){
+    AndreBarman(PeopleLocation loc, int speed, ClubGrid club, AtomicBoolean paused, CountDownLatch startSignal) throws InterruptedException{
         this.myLocation = loc;
         this.movingSpeed = speed;
         this.club = club;
         this.paused = paused;
+        this.startSignal = startSignal;
 
     }
     

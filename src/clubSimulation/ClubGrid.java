@@ -3,184 +3,211 @@
 
 package clubSimulation;
 
-//This class represents the club as a grid of GridBlocks
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class ClubGrid {
-	private GridBlock [][] Blocks;
+	private GridBlock[][] Blocks;
 	private final int x;
 	private final int y;
-	public  final int bar_y;
-	
+	public final int bar_y;
 	private GridBlock exit;
+	private GridBlock entrance; // hard coded entrance
 	private GridBlock barmanCounter;
-	private GridBlock entrance; //hard coded entrance
-	private final static int minX =5;//minimum x dimension
-	private final static int minY =5;//minimum y dimension
-	
+	private final static int minX = 5;// minimum x dimension
+	private final static int minY = 5;// minimum y dimension
+
 	private PeopleCounter counter;
 
-
-	
-	ClubGrid(int x, int y, int [] exitBlocks,PeopleCounter c) throws InterruptedException {
-		if (x<minX) x=minX; //minimum x
-		if (y<minY) y=minY; //minimum x
-		this.x=x;
-		this.y=y;
-		this.bar_y=y-3;
+	ClubGrid(int x, int y, int[] exitBlocks, PeopleCounter c) throws InterruptedException {
+		if (x < minX)
+			x = minX; // minimum x
+		if (y < minY)
+			y = minY; // minimum x
+		this.x = x;
+		this.y = y;
+		this.bar_y = y - 3;
 		Blocks = new GridBlock[x][y];
-		barmanCounter = Blocks[getMaxX() - 1][getBar_y() + 1];
 		this.initGrid(exitBlocks);
-		entrance=Blocks[getMaxX()/2][0];
-		counter=c;
-		}
-	
-	//initialise the grsi, creating all the GridBlocks
-	private  void initGrid(int []exitBlocks) throws InterruptedException {
-		for (int i=0;i<x;i++) {
-			for (int j=0;j<y;j++) {
-				boolean exit_block=false;
-				boolean bar=false;
-				boolean dance_block=false;
-				if ((i==exitBlocks[0])&&(j==exitBlocks[1])) {exit_block=true;}
-				else if (j>=(y-3)) bar=true; 
-				else if ((i>x/2) && (j>3) &&(j< (y-5))) dance_block=true;
-				//bar is hardcoded two rows before  the end of the club
-				Blocks[i][j]=new GridBlock(i,j,exit_block,bar,dance_block);
-				if (exit_block) {this.exit = Blocks[i][j];}
+		entrance = Blocks[getMaxX() / 2][0];
+		barmanCounter = Blocks[getMaxX() - 1][getBar_y() + 1];
+		counter = c;
+	}
+
+	// initialise the grsi, creating all the GridBlocks
+	private void initGrid(int[] exitBlocks) throws InterruptedException {
+		for (int i = 0; i < x; i++) {
+			for (int j = 0; j < y; j++) {
+				boolean exit_block = false;
+				boolean bar = false;
+				boolean dance_block = false;
+				if ((i == exitBlocks[0]) && (j == exitBlocks[1])) {
+					exit_block = true;
+				} else if (j >= (y - 3))
+					bar = true;
+				else if ((i > x / 2) && (j > 3) && (j < (y - 5)))
+					dance_block = true;
+				// bar is hardcoded two rows before the end of the club
+				Blocks[i][j] = new GridBlock(i, j, exit_block, bar, dance_block);
+				if (exit_block) {
+					this.exit = Blocks[i][j];
+				}
 			}
 		}
 	}
-	
+
 	public synchronized int getMaxX() {
 		return x;
 	}
-	
+
 	public synchronized int getMaxY() {
 		return y;
 	}
 
-	public synchronized GridBlock whereEntrance() { 
+	public synchronized GridBlock whereEntrance() {
 		return entrance;
 	}
 
 	public synchronized boolean inGrid(int i, int j) {
-		if ((i>=x) || (j>=y) ||(i<0) || (j<0)) 
+		if ((i >= x) || (j >= y) || (i < 0) || (j < 0))
 			return false;
 		return true;
 	}
-	
-	public  synchronized boolean inPatronArea(int i, int j) {
-		if ((i>=x) || (j>bar_y) ||(i<0) || (j<0)) 
-			return false;
-		return true;
-	}
-	
-	public synchronized GridBlock enterClub(PeopleLocation myLocation) throws InterruptedException  {
 
-		synchronized (entrance) {
-			while(counter.overCapacity() || entrance.occupied()){
-				entrance.wait(1000);
+	public synchronized boolean inPatronArea(int i, int j) {
+		if ((i >= x) || (j > bar_y) || (i < 0) || (j < 0))
+			return false;
+		return true;
+	}
+
+	public GridBlock enterClub(PeopleLocation myLocation) throws InterruptedException {
+
+		synchronized (counter) {
+			counter.personArrived(); // add to counter of people waiting
+			try {
+				while (counter.overCapacity())// while the club is overcapacity
+					counter.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-			counter.personArrived(); //add to counter of people waiting 
-			entrance.get(myLocation.getID());
-			counter.personEntered(); //add to counter
+			synchronized (entrance) {
+				while (!entrance.get(myLocation.getID())) {// while the entrance block is occupied
+					entrance.wait();
+				}
+			}
+			// entrance.get(myLocation.getID());
+			counter.personEntered(); // add to counter
 			myLocation.setLocation(entrance);
 			myLocation.setInRoom(true);
-			return entrance;
+
+		}
+		return entrance;
+
+	}
+
+	/**
+	 * This function sets the initial postition of the barman
+	 * 
+	 * @param myLocation the PeopleLocation variable of the barmanCountermanCountermanCountermanCountermanCountermanCountermanCounterman
+	 * @return the barmanCounterman initial postition
+	 * @throws InterruptedException
+	 */
+
+	public synchronized GridBlock startBar(PeopleLocation myLocation) throws InterruptedException {
+		myLocation.setLocation(barmanCounter);
+		myLocation.setInRoom(true);
+		return barmanCounter;
+
+	}
+
+	public GridBlock move(GridBlock currentBlock, int step_x, int step_y, PeopleLocation myLocation)
+			throws InterruptedException { // try to move in
+		synchronized (entrance) {
+			if (!entrance.occupied()) {
+				entrance.notifyAll();
 			}
-	}
-	
-	
-	public GridBlock move(GridBlock currentBlock,int step_x, int step_y,PeopleLocation myLocation) throws InterruptedException {  //try to move in 
-		
-		int c_x= currentBlock.getX();
-		int c_y= currentBlock.getY();
-		
-		int new_x = c_x+step_x; //new block x coordinates
-		int new_y = c_y+step_y; // new block y  coordinates
-		
-		//restrict i an j to grid
-		if (!inPatronArea(new_x,new_y)) {
-			//Invalid move to outside  - ignore
-			return currentBlock;
 		}
-
-		if ((new_x==currentBlock.getX())&&(new_y==currentBlock.getY())) //not actually moving
-			return currentBlock;
-		 
-		GridBlock newBlock = Blocks[new_x][new_y];
-		
-		if (!newBlock.get(myLocation.getID())) return currentBlock; //stay where you are
-			
-		currentBlock.release(); //must release current block
-		myLocation.setLocation(newBlock);
-		return newBlock;
-	} 
-	
-
-	public  synchronized void leaveClub(GridBlock currentBlock,PeopleLocation myLocation)   {
-		synchronized (counter){
-			currentBlock.release();
-			counter.personLeft(); //add to counter
-			myLocation.setInRoom(false);
-			entrance.notifyAll();
-		}
-	}
-
-	public synchronized GridBlock getBarmanCounter(PeopleLocation myLocation) throws InterruptedException {
-
-		synchronized (barmanCounter) {
-			while(barmanCounter.occupied()){
-				barmanCounter.wait();
-			}
-			barmanCounter.get(myLocation.getID());
-			myLocation.setLocation(barmanCounter);
-			myLocation.setInRoom(true);
-			return barmanCounter;
-		}
-	}
-
-	public GridBlock servingDrinks(GridBlock currentBlock,int step_x, int step_y,PeopleLocation myLocation) throws InterruptedException {
 
 		int c_x = currentBlock.getX();
 		int c_y = currentBlock.getY();
 
-		int new_x = c_x + step_x; //new block x coordinates
-		int new_y = c_y + step_y; // new block y  coordinates
+		int new_x = c_x + step_x; // new block x coordinates
+		int new_y = c_y + step_y; // new block y coordinates
 
-		//restrict i an j to grid
-		if (!inPatronArea(new_x,new_y)) {
-			//Invalid move to outside  - ignore
+		// restrict i an j to grid
+		if (!inPatronArea(new_x, new_y)) {
+			// Invalid move to outside - ignore
 			return currentBlock;
 		}
 
-		if (new_x <= -1 || new_x >= getMaxX()) {
-			return currentBlock;
-		}
-
-		if ((new_x==currentBlock.getX())&&(new_y==currentBlock.getY())) //not actually moving
+		if ((new_x == currentBlock.getX()) && (new_y == currentBlock.getY())) // not actually moving
 			return currentBlock;
 
 		GridBlock newBlock = Blocks[new_x][new_y];
 
-		if (!newBlock.get(myLocation.getID())) return currentBlock; //stay where you are
+		if (!newBlock.get(myLocation.getID()))
+			return currentBlock; // stay where you are
 
-		currentBlock.release(); //must release current block
+		currentBlock.release(); // must release current block
 		myLocation.setLocation(newBlock);
 		return newBlock;
 	}
 
-	public GridBlock getExit() {
+	/*
+	 * This function is responsible for the movement of the barman
+	 * @param currentBlock
+	 * @param step_x
+	 * @param step_y
+	 * @param myLocation
+	 * @return the new block
+	 */
+	public GridBlock serveDrinks(GridBlock currentBlock, int step_x, int step_y, PeopleLocation myLocation)
+			throws InterruptedException {
+
+		int c_x = currentBlock.getX();
+		int c_y = currentBlock.getY();
+
+		int new_x = c_x + step_x; // new block x coordinates
+		int new_y = c_y + step_y; // new block y coordinates
+		if (new_x <= -1 || new_x >= 20) {
+			return currentBlock;
+		}
+
+		if ((new_x == currentBlock.getX()) && (new_y == currentBlock.getY())) // not actually moving
+			return currentBlock;
+
+		GridBlock newBlock = Blocks[new_x][new_y];
+
+		if (!newBlock.get(myLocation.getID()))
+			return currentBlock; // stay where you are
+
+		currentBlock.release(); // must release current block
+		myLocation.setLocation(newBlock);
+		return newBlock;
+	}
+
+	public void leaveClub(GridBlock currentBlock, PeopleLocation myLocation) {
+		synchronized (counter) {
+			currentBlock.release();
+			counter.personLeft(); // add to counter
+			myLocation.setInRoom(false);
+			// entrance.notifyAll();
+			counter.notifyAll();// notify all patron threads to attempt to enter the club
+		}
+
+	}
+
+	public synchronized GridBlock getExit() {
 		return exit;
 	}
 
 	public GridBlock whichBlock(int xPos, int yPos) {
-		if (inGrid(xPos,yPos)) {
+		if (inGrid(xPos, yPos)) {
 			return Blocks[xPos][yPos];
 		}
-		System.out.println("block " + xPos + " " +yPos + "  not found");
+		System.out.println("block " + xPos + " " + yPos + "  not found");
 		return null;
 	}
-	
+
 	public void setExit(GridBlock exit) {
 		this.exit = exit;
 	}
@@ -189,10 +216,12 @@ public class ClubGrid {
 		return bar_y;
 	}
 
+	public synchronized PeopleCounter getCounter() {
+		return counter;
+	}
+
+	public synchronized GridBlock[][] getBlocks() {
+		return Blocks;
+	}
+
 }
-
-
-	
-
-	
-

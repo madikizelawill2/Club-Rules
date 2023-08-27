@@ -1,67 +1,70 @@
 package clubSimulation;
+
 import java.util.concurrent.atomic.*;
 
 public class PeopleCounter {
-	private AtomicInteger peopleOutSide; //counter for people arrived but not yet in the building
-	private AtomicInteger peopleInside; //counter for patrons inside club
-	private AtomicInteger peopleLeft; //counter for patrons who have left the club
-	private AtomicInteger maxPeople; //maximum patrons allowed in the club at one time
-	
+	private AtomicInteger peopleOutSide; // counter for people arrived but not yet in the building
+	private AtomicInteger peopleInside; // counter for patrons inside club
+	private AtomicInteger peopleLeft; // counter for patrons who have left the club
+	private AtomicInteger maxPeople; // maximum patrons allowed in the club at one time
+
 	PeopleCounter(int max) {
 		peopleOutSide = new AtomicInteger(0);
 		peopleInside = new AtomicInteger(0);
 		peopleLeft = new AtomicInteger(0);
 		maxPeople = new AtomicInteger(max);
 	}
-		
-	synchronized public int getWaiting() {
+
+	public int getWaiting() {
 		return peopleOutSide.get();
 	}
 
-	synchronized public int getInside() {
+	public int getInside() {
 		return peopleInside.get();
 	}
-	
-	synchronized public int getTotal() {
-		return (peopleOutSide.get()+peopleInside.get()+peopleLeft.get());
+
+	public int getTotal() {
+		return (peopleOutSide.get() + peopleInside.get() + peopleLeft.get());
 	}
 
-	synchronized public int getLeft() {
+	public int getLeft() {
 		return peopleLeft.get();
 	}
-	
-	synchronized public int getMax() {
+
+	public int getMax() {
 		return maxPeople.get();
 	}
-	
-	//someone arrived outside
-	synchronized public void personArrived() {
+
+	// someone arrived outside
+	public void personArrived() {
 		peopleOutSide.getAndIncrement();
 	}
-	
-	//someone got inside
+
+	// someone got inside
 	synchronized public void personEntered() {
 		peopleOutSide.getAndDecrement();
 		peopleInside.getAndIncrement();
 	}
 
-	//someone left
+	// someone left
 	synchronized public void personLeft() {
 		peopleInside.getAndDecrement();
 		peopleLeft.getAndIncrement();
-		
+
 	}
-	//too many people inside
+
+	// too many people inside
 	synchronized public boolean overCapacity() {
-		if(peopleInside.get()>=maxPeople.get())
+		if (peopleInside.get() >= maxPeople.get())
 			return true;
 		return false;
 	}
-	
-	//not used
+
+	// not used
 	synchronized public void resetScore() {
 		peopleInside.set(0);
 		peopleOutSide.set(0);
 		peopleLeft.set(0);
 	}
+
 }

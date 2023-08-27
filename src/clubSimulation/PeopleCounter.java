@@ -8,10 +8,10 @@ public class PeopleCounter {
 	private AtomicInteger maxPeople; //maximum patrons allowed in the club at one time
 	
 	PeopleCounter(int max) {
-		peopleOutSide= new AtomicInteger(0);
-		peopleInside=new AtomicInteger(0);
-		peopleLeft=new AtomicInteger(0);
-		maxPeople=new AtomicInteger(max);
+		peopleOutSide = new AtomicInteger(0);
+		peopleInside = new AtomicInteger(0);
+		peopleLeft = new AtomicInteger(0);
+		maxPeople = new AtomicInteger(max);
 	}
 		
 	synchronized public int getWaiting() {

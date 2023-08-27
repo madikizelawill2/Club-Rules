@@ -36,18 +36,22 @@ public class Clubgoer extends Thread {
 	}
 	
 	//getter
-	public synchronized boolean inRoom() {
+	public boolean inRoom() {
 		return inRoom;
 	}
 	
 	//getter
-	public synchronized int getX() { return currentBlock.getX();}	
+	public int getX() { return currentBlock.getX();}	
 	
 	//getter
-	public  synchronized int getY() {	return currentBlock.getY();	}
+	public  int getY() {	return currentBlock.getY();	}
 	
 	//getter
-	public  synchronized int getSpeed() { return movingSpeed; }
+	public  int getSpeed() { return movingSpeed; }
+
+	public PeopleLocation getLocation() {
+		return myLocation;
+	}
 
 	//setter
 
@@ -55,19 +59,19 @@ public class Clubgoer extends Thread {
 	private void checkPause() {
 		// THIS DOES NOTHING - MUST BE FIXED
 		synchronized (paused) {
-			while (paused.get()) {
-				try {
+			try {
+				while (paused.get()) {
 					paused.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
 				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}  	
         
     }
 	private void startSim() {
 		// THIS DOES NOTHING - MUST BE FIXED 
-		synchronized (this) {
+		synchronized (startSignal) {
 			try {
 				startSignal.await();
 			} catch (InterruptedException e) {
@@ -85,15 +89,17 @@ public class Clubgoer extends Thread {
 	}
 	
 	//get drink at bar
-		private synchronized void getDrink() throws InterruptedException {
+		private void getDrink() throws InterruptedException {
 			//FIX SO BARMAN GIVES THE DRINK AND IT IS NOT AUTOMATIC
-			while (!BarmanPos()) {
-				wait(1000);
+			synchronized(this){
+				while (!BarmanPos()) {
+					wait(1000);
+				}
+				this.wait(1000);
 			}
-			wait(1000);
 			thirsty=false;
 			System.out.println("Thread "+this.ID + " got drink at bar position: " + currentBlock.getX()  + " " +currentBlock.getY() );
-			sleep(movingSpeed*5);  //wait a bit
+			sleep(movingSpeed*6);  //wait a bit
 		}
 		
 	//--------------------------------------------------------

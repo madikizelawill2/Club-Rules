@@ -17,6 +17,7 @@ CLASSES=GridBlock \
 	ClubView \
 	ClubGrid \
 	Clubgoer \
+	AndreBarman \
 	ClubSimulation
 
 # Transform class names into corresponding .class filenames

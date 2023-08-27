@@ -48,10 +48,10 @@ public class GridBlock {
 		return isExit;	
 	}
 
-	public   boolean isBar() {
+	public boolean isBar() {
 		return isBar;
 	}
-	public   boolean isDanceFloor() {
+	public boolean isDanceFloor() {
 		return isDance;
 	}
 

@@ -78,7 +78,7 @@ public class ClubGrid {
 
 		synchronized (entrance) {
 			while(counter.overCapacity() || entrance.occupied()){
-				entrance.wait();
+				entrance.wait(1000);
 			}
 			counter.personArrived(); //add to counter of people waiting 
 			entrance.get(myLocation.getID());

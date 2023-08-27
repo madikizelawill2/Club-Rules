@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 
 public class ClubView extends JPanel implements Runnable {
 		private PeopleLocation[] patronLocations; //array of the locations of the patrons
-		private PeopleLocation barpersonLocation; // where is the barperson?
+		private PeopleLocation barpersonLocation = new PeopleLocation(ClubSimulation.noClubgoers); // where is the barperson?
 		private int noPatrons;  //total number in the simulation
 		private int [] exits; // where is the exit?
 		private int wIncr; //width of each block
@@ -17,8 +17,9 @@ public class ClubView extends JPanel implements Runnable {
 
 		ClubGrid grid; //shared grid
 		
-		ClubView(PeopleLocation[] custs,  ClubGrid grid,int []exits) { //constructor
+		ClubView(PeopleLocation[] custs,  ClubGrid grid,int []exits) throws InterruptedException { //constructor
 			this.patronLocations=custs; 
+			this.barpersonLocation.setLocation(new GridBlock(maxX + 1, grid.bar_y + 1, false, true, false));
 			noPatrons = custs.length;
 			this.grid = grid;
 			this.exits=exits;
@@ -79,6 +80,11 @@ public class ClubView extends JPanel implements Runnable {
 			 g.setFont(new Font("Helvetica", Font.BOLD, hIncr/2));
 			 
 			 //barman should go here
+			 g.setColor(Color.RED);
+			 x = (barpersonLocation.getX())*wIncr;
+			 y = (barpersonLocation.getY())*hIncr;
+			 g.fillOval(x+wIncr/4, y+hIncr/4 , wIncr/2, hIncr/2);
+			 g.drawString("BM",x+wIncr/4, y+wIncr/4);
 			 
 			 //patrons
 		    for (int i=0;i<noPatrons;i++){	    	

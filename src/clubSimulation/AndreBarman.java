@@ -41,7 +41,7 @@ public class AndreBarman extends Thread{
         }
     }
 
-    public synchronized void checkPause() throws InterruptedException{
+    public void checkPause() throws InterruptedException{
         synchronized (paused){
             try{
                 while (paused.get()){

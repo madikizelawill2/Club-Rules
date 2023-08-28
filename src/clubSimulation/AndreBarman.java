@@ -5,12 +5,25 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * This class is responsible for the barman's movement and serving the patrons
+ * This class is responsible for the barman's movement
  * @version 1.0
  * @since 2023
- * @author Will
+ * @authour Will
  */
 public class AndreBarman extends Thread {
+
+    /*
+     * isBarmanMoving - is the barman moving?
+     * currentBlock - the current block
+     * myLocation - the location of the barman
+     * barmanMovingSpeed - the speed of the barman
+     * stepsTaken - the number of steps taken by the barman
+     * rand - random number generator
+     * stepsTakenByBarman - the number of steps taken by the barman
+     * club - the club
+     * paused - is the game paused?
+     * startSignal - the start signal
+     */
     private boolean isBarmanMoving = false;
     GridBlock currentBlock = new GridBlock();
     public PeopleLocation myLocation;
@@ -28,12 +41,8 @@ public class AndreBarman extends Thread {
     * @param speed
     * @param club
     * @param paused
-    * @param startSignal
-    * @throws InterruptedException
     */
-    AndreBarman(PeopleLocation loc, int speed, ClubGrid club, AtomicBoolean paused,
-            CountDownLatch startSignal)
-            throws InterruptedException {
+    AndreBarman(PeopleLocation loc, int speed, ClubGrid club, AtomicBoolean paused,CountDownLatch startSignal)throws InterruptedException {
         this.myLocation = loc;
         this.barmanMovingSpeed = speed;
         this.club = club;
@@ -41,22 +50,22 @@ public class AndreBarman extends Thread {
         this.startSignal = startSignal;
     }
 
+   
     /**
-     * This method checks if there is a patron in the block
-     * @return
+     * This method is responsible for checking if the person is in the room and needs to be served
+     * @return whether the person is in the room or not
      * @throws InterruptedException
+     * @param in - status of the persons position
      */
     public synchronized boolean personToBeServed() throws InterruptedException {
 
-        if (club.whichBlock(currentBlock.getX(), club.getBar_y()).occupied()) {
-            return true;
-        }
+        if (club.whichBlock(currentBlock.getX(), club.getBar_y()).occupied()) {return true;}
         return false;
-
     }
 
+    
     /**
-     * This method is responsible for the barman's movement
+     * This method is responsible for serving people
      * @throws InterruptedException
      */
     public void servingPeople() throws InterruptedException {
@@ -97,6 +106,9 @@ public class AndreBarman extends Thread {
         }
     }
 
+    /**
+     * This function starts the simulation
+     */
     private void startSimulation() {
         synchronized (startSignal) {
             try {
@@ -108,7 +120,9 @@ public class AndreBarman extends Thread {
         }
     }
 
-
+    /**
+     * This function runs the barman thread
+     */
     public void run() {
         startSimulation();
         checkGamePaused();

@@ -1,15 +1,34 @@
-//M. M. Kuttel 2023 mkuttel@gmail.com
 package clubSimulation;
 
 import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/*
- This is the basic ClubGoer Thread class, representing the patrons at the club
+/**
+ * This class is responsible for the clubgoer's movement
+ * @version 1.0
+ * @since 2023
+ * @authour Will
  */
-
 public class Clubgoer extends Thread {
+	/*
+	 * ID - each person has an ID
+	 * myColor - colour of the person
+	 * inRoom - are they in the club?
+	 * arrived - have they arrived at the club?
+	 * location - which GridBlock are they on?
+	 * club - the club
+	 * paused - is the game paused?
+	 * startSignal - the start signal
+	 * currentBlock - the current block
+	 * rand - random number generator
+	 * clubGoerMovingSpeed - the speed of the clubgoer
+	 * myLocation - the location of the clubgoer
+	 * inRoom - is the clubgoer in the room?
+	 * thirsty - is the clubgoer thirsty?
+	 * wantToLeave - does the clubgoer want to leave?
+	 * ID - the ID of the clubgoer
+	 */
 
 	public static ClubGrid club;
 	public static AtomicBoolean paused;
@@ -28,6 +47,7 @@ public class Clubgoer extends Thread {
 	 * @param ID
 	 * @param loc
 	 * @param speed
+	 * @throws InterruptedException
 	 */
 	Clubgoer(int ID, PeopleLocation loc, int speed) {
 		this.ID = ID;
@@ -48,20 +68,17 @@ public class Clubgoer extends Thread {
 	public int getX() {return currentBlock.getX();}
 	public int getY() {return currentBlock.getY();}
 	public int getSpeed() {return clubGoerMovingSpeed;}
-
-	public PeopleLocation getClubgoerLocation() {
-		return myLocation;
-	}
+	public PeopleLocation getClubgoerLocation() {return myLocation;}
 
 	/**
-	 * This method is responsible for checking if the game is paused or not
-	 * @return whether the game is paused or not
+	 * This method is responsible for checking if the game is paused
+	 * @throws InterruptedException
 	 */
 	private void checkPause() {
 		synchronized (paused) {
 			try {
 				while (paused.get()) {
-					paused.wait();// wait while paused is true
+					paused.wait();
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -70,6 +87,10 @@ public class Clubgoer extends Thread {
 
 	}
 
+	/**
+	 * This method is responsible for starting the game (simulation)
+	 * @throws InterruptedException
+	 */
 	private void startSimulation() {
 		synchronized (startSignal) {
 			try {
@@ -81,6 +102,10 @@ public class Clubgoer extends Thread {
 
 	}
 	
+	/**
+	 * This method is responsible for checking if the barman is in the block
+	 * @throws InterruptedException
+	 */
 	public synchronized boolean BarmanInBlock() throws InterruptedException {
 
 		if (club.whichBlock(currentBlock.getX(), club.getBar_y() + 1).occupied()) {
@@ -89,8 +114,9 @@ public class Clubgoer extends Thread {
 		return false;
 
 	}
+	
 	/**
-	 * This method is responsible for ensuring that the clubgoer gets a drink
+	 * This method is responsible for getting the drink
 	 * @throws InterruptedException
 	 */
 	private void getDrink() throws InterruptedException {
@@ -98,7 +124,7 @@ public class Clubgoer extends Thread {
 			while (!BarmanInBlock()) {
 				this.wait(1000);
 			}
-			this.wait(1000);
+			this.wait(3000);
 		}
 		thirsty = false;
 		System.out.println(

@@ -1,5 +1,3 @@
-//M. M. Kuttel 2023 mkuttel@gmail.com
-
 package clubSimulation;
 
 // the main class, starts all threads
@@ -12,31 +10,63 @@ import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/*
+ * This is the main class, responsible for starting all the threads
+ * @version 1.0
+ * @since 2023
+ * @authour Will
+ */
 public class ClubSimulation {
+
+	/*
+	 * noClubgoers - number of customers
+	 * frameX - width of frame
+	 * frameY - height of frame
+	 * yLimit - how far up the screen the club is
+	 * gridX - number of x grids in club
+	 * gridY - number of y grids in club
+	 * max - max number of customers
+	 * patrons - array of customer threads
+	 * peopleLocations - array of customer locations
+	 * andreBarman - barman thread
+	 * barmanLocation - barman location
+	 * tallys - counters for number of people inside and outside club
+	 * clubView - threaded panel to display terrain
+	 * clubGrid - club grid
+	 * counterDisplay - threaded display of counters
+	 * maxWait - for the slowest customer
+	 * minWait - for the fastest cutomer
+	 */
 	static int noClubgoers = 50;
 	static int frameX = 650;
 	static int frameY = 650;
 	static int yLimit = 50;
-	static int gridX = 20; // number of x grids in club - default value if not provided on command line
-	static int gridY = 20; // number of y grids in club - default value if not provided on command line
-	static int max = 20; // max number of customers - default value if not provided on command line
-
-	static Clubgoer[] patrons; // array for customer threads
-	static PeopleLocation[] peopleLocations; // array to keep track of where customers are
+	static int gridX = 20;
+	static int gridY = 20;
+	static int max = 20;
+	static Clubgoer[] patrons;
+	static PeopleLocation[] peopleLocations;
 	static AndreBarman andreBarman;
 	static PeopleLocation barmanLocation;
+	static PeopleCounter tallys; 
+	static ClubView clubView;
+	static ClubGrid clubGrid;
+	static CounterDisplay counterDisplay;
+	private static int maxWait = 1200;
+	private static int minWait = 500;
 
-	static PeopleCounter tallys; // counters for number of people inside and outside club
-
-	static ClubView clubView; // threaded panel to display terrain
-	static ClubGrid clubGrid; // club grid
-	static CounterDisplay counterDisplay; // threaded display of counters
-
-	private static int maxWait = 1200; // for the slowest customer
-	private static int minWait = 500; // for the fastest cutomer
-
+	/*
+	 * This method is responsible for setting up the GUI
+	 * @param frameX - width of frame
+	 * @param frameY - height of frame
+	 * @param exits - where is the exit?
+	 * @throws InterruptedException
+	 */
 	public static void setupGUI(int frameX, int frameY, int[] exits) throws InterruptedException {
-		// Frame initialize and dimensions
+
+		/*
+		 * frame - initialise the frame dimensions
+		 */
 		JFrame frame = new JFrame("club animation");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(frameX, frameY);
@@ -49,7 +79,10 @@ public class ClubSimulation {
 		clubView.setSize(frameX, frameY);
 		g.add(clubView);
 
-		// add all the counters to the panel
+		
+		/*
+		 * Add all the counters to the panel
+		 */
 		JPanel txt = new JPanel();
 		txt.setLayout(new BoxLayout(txt, BoxLayout.LINE_AXIS));
 		JLabel maxAllowed = new JLabel("Max: " + tallys.getMax() + "    ");
@@ -63,38 +96,48 @@ public class ClubSimulation {
 		g.add(txt);
 		counterDisplay = new CounterDisplay(caught, missed, scr, tallys); // thread to update score
 
-		// Add start, pause and exit buttons
+		/*
+		 * Add all the buttons to the panel
+		 * including the start, pause and quit buttons
+		 */
 		JPanel b = new JPanel();
 		b.setLayout(new BoxLayout(b, BoxLayout.LINE_AXIS));
 		final JButton startB = new JButton("Start");
+
 		// add the listener to the jbutton to handle the "pressed" event
 		startB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Clubgoer.startSignal.countDown();// Decrementing the latch
+				Clubgoer.startSignal.countDown();
 				startB.setEnabled(false);
 
 			}
 		});
 
 		final JButton pauseB = new JButton("Pause ");
-		// add the listener to the jbutton to handle the "pressed" event
+		/*
+		 * This method is responsible for pausing and resuming the game
+		 * @param e - action event
+		 */
 		pauseB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				synchronized (Clubgoer.paused) {// put lock on the paused variable
-					if (Clubgoer.paused.get() == false) {// if paused is false
-						Clubgoer.paused.set(true);// set true
-						pauseB.setText("Resume");// change the text of the button to "Resume"
+				synchronized (Clubgoer.paused) {
+					if (Clubgoer.paused.get() == false) {
+						Clubgoer.paused.set(true);
+						pauseB.setText("Resume");
 					} else {
-						Clubgoer.paused.set(false);// else set false
-						Clubgoer.paused.notifyAll();// notify the threads to continue
-						pauseB.setText("Pause");// change the text of the button to "Pause"
+						Clubgoer.paused.set(false);
+						Clubgoer.paused.notifyAll();
+						pauseB.setText("Pause");
 					}
 				}
 			}
 		});
 
 		JButton endB = new JButton("Quit");
-		// add the listener to the jbutton to handle the "pressed" event
+		/*
+		 * This method is responsible for quitting the game
+		 * @param e - action event
+		 */
 		endB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
@@ -125,22 +168,15 @@ public class ClubSimulation {
 			max = Integer.parseInt(args[3]); // max people allowed in club
 		}
 
-		// hardcoded exit doors
-		int[] exit = { 0, (int) gridY / 2 - 1 }; // once-cell wide door on left
-
-		tallys = new PeopleCounter(max); // counters for people inside and outside club
-		clubGrid = new ClubGrid(gridX, gridY, exit, tallys); // setup club with size and exitsand maximum limit for
-																// people
-		Clubgoer.club = clubGrid; // grid shared with class
-
+		int[] exit = { 0, (int) gridY / 2 - 1 }; 
+		tallys = new PeopleCounter(max); 
+		clubGrid = new ClubGrid(gridX, gridY, exit, tallys); 
+		Clubgoer.club = clubGrid;
 		peopleLocations = new PeopleLocation[noClubgoers];
 		patrons = new Clubgoer[noClubgoers];
 		int movingSpeed = (int) (Math.random() * (maxWait - minWait) + minWait);
-		barmanLocation = new PeopleLocation(noClubgoers);// initialse the barman location
-		andreBarman = new AndreBarman(barmanLocation, movingSpeed, clubGrid, Clubgoer.paused,
-				Clubgoer.startSignal);// initialise the barman thread.
-
-		Random rand = new Random();
+		barmanLocation = new PeopleLocation(noClubgoers);
+		andreBarman = new AndreBarman(barmanLocation, movingSpeed, clubGrid, Clubgoer.paused,Clubgoer.startSignal);
 
 		for (int i = 0; i < noClubgoers; i++) {
 			peopleLocations[i] = new PeopleLocation(i);
@@ -155,8 +191,10 @@ public class ClubSimulation {
 		// Start counter thread - for updating counters
 		Thread s = new Thread(counterDisplay);
 		s.start();
-
-		andreBarman.start();// start the barman thread
+		/*
+		 * Start the barman thread
+		 */
+		andreBarman.start();
 		for (int i = 0; i < noClubgoers; i++) {
 			patrons[i].start();
 		}

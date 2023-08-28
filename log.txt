@@ -1,0 +1,119 @@
+commit a5f24debef000cb834a49f278b6f15d38c59fbc2
+Author: Will <madikizelawill2@gmail.com>
+Date:   Mon Aug 28 20:56:25 2023 +0200
+
+    [UPDATED] all the files and esnured clealiness of the code
+
+commit 4c9fe0ed6ca1c644ffbac3b712cfa7eb00c5103f
+Author: Will <madikizelawill2@gmail.com>
+Date:   Sun Aug 27 23:58:56 2023 +0200
+
+    [FIXED] the deadlock issue with the interface
+
+commit fe2974ce8dfa0487269f8bad649ef1d4dcc1f467
+Author: Will <madikizelawill2@gmail.com>
+Date:   Sun Aug 27 17:55:07 2023 +0200
+
+    [ADDED] barman and made changes to fix the deadlock
+
+commit b1cb0b929e75aeb19fdc7cdc42eb1fad7bca7d2f
+Author: Will <madikizelawill2@gmail.com>
+Date:   Sat Aug 26 21:50:53 2023 +0200
+
+    [UPDATED] the clubSim and added a part to start the bar man thread
+
+commit a06537d79d1880b2e9ee7ff7784b69dd5bdf6a15
+Author: Will <madikizelawill2@gmail.com>
+Date:   Sat Aug 26 21:36:50 2023 +0200
+
+    [ADDED] Moving bar man acroess the bar and run() for thread class
+
+commit 16dd9f2ce9bfbb7f9f382a2b567c4351fa20fab0
+Author: Will <madikizelawill2@gmail.com>
+Date:   Sat Aug 26 02:46:21 2023 +0200
+
+    [ADDED] Barman counter and barman functionality including serving and moving
+
+commit 703f259454aad50f0df6665e4b6201d73d7d47fe
+Author: Will <madikizelawill2@gmail.com>
+Date:   Sat Aug 26 01:10:03 2023 +0200
+
+    [UPDATED] the clun goer to ensure synchronization is done correctly
+
+commit 457ae19ea4fafd7b431d1cc00198fbbfb034e93d
+Author: Will <madikizelawill2@gmail.com>
+Date:   Fri Aug 25 23:26:28 2023 +0200
+
+    [UPDATED] the functions and synchronized them
+
+commit cf08cc9f0d3abb41b54bec6d05b944bfe1f1c97f
+Author: Will <madikizelawill2@gmail.com>
+Date:   Fri Aug 25 23:13:53 2023 +0200
+
+    [ADDED] functionaliy for the pause and play btn
+
+commit 38d6ae933ab7c6ea1d772f3457f3f8e5490f2a1b
+Author: Will <madikizelawill2@gmail.com>
+Date:   Fri Aug 25 22:21:49 2023 +0200
+
+    [ADDED] Barman position tracker
+
+commit 98a020a1dd38a985c12bc14f5f8a7faf0cbda9c4
+Author: Will <madikizelawill2@gmail.com>
+Date:   Fri Aug 25 12:08:35 2023 +0200
+
+    [ADDED] pause and startsim indicators
+
+commit 45b95672b50edacc3d093e677f34098789db2ea3
+Author: Will <madikizelawill2@gmail.com>
+Date:   Tue Aug 22 17:50:09 2023 +0200
+
+    [ADDED] synchronized for getters and setters for PeopleLocation class
+
+commit 4e551e9bfdbdcb76d2dabda609d8531a9ea348cc
+Author: Will <madikizelawill2@gmail.com>
+Date:   Tue Aug 22 17:46:57 2023 +0200
+
+    [ADDED] the synchronize lock and key mechanism for getters a nd setters for PeopleCounter class
+
+commit 6f66de877946bb247e75203d0a44274e7c6fe549
+Author: Will <madikizelawill2@gmail.com>
+Date:   Tue Aug 22 08:41:11 2023 +0200
+
+    [ADDED] Makefile code and fixed aany errors that erose
+
+commit 79be71ea29e9a6e851c93fde26cda0afb0035d28
+Author: Will <madikizelawill2@gmail.com>
+Date:   Mon Aug 21 08:28:01 2023 +0200
+
+    [ADDED] make file to run and compile the project
+
+commit d9973de823bb9922878011aae149dba9ebbef28b
+Author: Will <madikizelawill2@gmail.com>
+Date:   Wed Aug 16 22:42:43 2023 +0200
+
+    [ADDED] javadoc files for the simulation
+
+commit 077a6701cc335723f69155a0c9a7ae396f8097d8
+Author: Will <madikizelawill2@gmail.com>
+Date:   Wed Aug 16 22:17:15 2023 +0200
+
+    [ADDED] Makefile to run or start the program
+
+commit da8de518858d1ad54ad5b27714d51dd1b765ca3b
+Author: Will <madikizelawill2@gmail.com>
+Date:   Wed Aug 16 22:09:15 2023 +0200
+
+    [ADDED] report file and started with the report set up
+
+commit 41ce0a7bd3460360655aadf2cce46ed5cb2dd9c9
+Author: Will <madikizelawill2@gmail.com>
+Date:   Tue Aug 15 09:05:21 2023 +0200
+
+    [ADDED] inital files to start solving the problem
+
+commit 5387756efb6a3eb3b949232d2ebe9cf90478f60a
+Author: Will Madikizela <63541852+madikizelawill2@users.noreply.github.com>
+Date:   Tue Aug 15 08:55:59 2023 +0200
+
+    Initial commit
